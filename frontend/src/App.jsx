@@ -1,116 +1,101 @@
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Activity, BrainCircuit, History, FileText, Lock } from 'lucide-react';
+import React, { useState } from 'react';
 
 export default function App() {
   const [aba, setAba] = useState('ia');
-  const [sintomas, setSintomas] = useState('');
+  const [texto, setTexto] = useState('');
   const [logs, setLogs] = useState([]);
-  const [analiseAtual, setAnaliseAtual] = useState(null);
 
-  // SIMULAÇÃO DE LOG DE MISSÃO CRÍTICA (PERSISTÊNCIA)
-  const salvarLogClinico = (input, output) => {
+  // Função de Auditoria Clínica
+  const processarDecisao = () => {
+    console.log("Evento de clique detectado no botão IA");
+    
+    if (!texto) {
+      console.warn("Tentativa de processamento sem texto.");
+      alert("Por favor, insira dados clínicos para análise.");
+      return;
+    }
+
     const novoLog = {
-      id: `LOG-${Date.now()}`,
-      timestamp: new Date().toLocaleString('pt-BR'),
-      medicoId: "CRM-AM-XXXX", // Puxaria do perfil do Dr. Paulo
-      entradaPaciente: input,
-      sugestaoIA: output,
-      hashIntegridade: Math.random().toString(36).substring(2, 15) // Simulação de Hash SHA-256
+      id: Date.now(),
+      data: new Date().toLocaleString('pt-BR'),
+      conteudo: texto,
+      status: "VERIFICADO - FINEP PROTOCOL"
     };
-    setLogs([novoLog, ...logs]);
-  };
 
-  const executarAnalise = () => {
-    if (!sintomas) return;
-    
-    // Lógica Preditiva
-    const resultado = "BIOGSAÚDE IA: Detectado padrão sugestivo de Gastrite Erosiva. Recomendado protocolo de confirmação via EDA.";
-    
-    setAnaliseAtual(resultado);
-    salvarLogClinico(sintomas, resultado);
+    console.log("Novo Log gerado:", novoLog);
+    setLogs([novoLog, ...logs]);
+    setAba('logs');
+    alert("Decisão Clínica Processada e Registrada no Log.");
   };
 
   return (
-    <div className="min-h-screen bg-[#010b13] text-slate-200 font-sans flex flex-col">
+    <div style={{ backgroundColor: '#021526', minHeight: '100vh', color: '#e2e8f0', fontFamily: 'Segoe UI, Roboto, sans-serif' }}>
       
-      {/* HEADER COM STATUS DE SEGURANÇA */}
-      <nav className="p-4 bg-[#081b2b] border-b border-cyan-900/30 flex justify-between items-center sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Activity className="text-[#00afb9]" />
-          <h1 className="font-black tracking-tighter uppercase">Biog<span className="text-[#00afb9]">Saúde</span> <span className="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded ml-2 border border-cyan-800">CRITICAL-MODE</span></h1>
+      {/* HEADER DESKTOP */}
+      <header style={{ backgroundColor: '#082635', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #00afb9' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ backgroundColor: '#00afb9', padding: '8px', borderRadius: '8px', color: '#021526', fontWeight: 'bold' }}>BS</div>
+          <h1 style={{ margin: 0, fontSize: '24px', letterSpacing: '-1px' }}>BIOG<span style={{ color: '#00afb9' }}>SAÚDE</span></h1>
         </div>
-        <div className="flex gap-4">
-          <button onClick={() => setAba('ia')} className={`p-2 rounded-lg ${aba === 'ia' ? 'bg-cyan-900/40 text-cyan-400' : 'text-slate-500'}`}><BrainCircuit size={20}/></button>
-          <button onClick={() => setAba('logs')} className={`p-2 rounded-lg ${aba === 'logs' ? 'bg-cyan-900/40 text-cyan-400' : 'text-slate-500'}`}><History size={20}/></button>
+        <div style={{ fontSize: '12px', color: '#00afb9', border: '1px solid #00afb9', padding: '5px 12px', borderRadius: '20px', fontWeight: 'bold' }}>
+          Módulo Pericial Ativo
         </div>
-      </nav>
+      </header>
 
-      <main className="flex-1 p-6 max-w-4xl mx-auto w-full">
+      {/* ÁREA DE TRABALHO */}
+      <main style={{ maxWidth: '800px', margin: '40px auto', padding: '0 20px' }}>
         
-        {aba === 'ia' && (
-          <div className="animate-in fade-in duration-500">
-            <header className="mb-8">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <ShieldCheck className="text-green-500" /> Analisador Preditivo
-              </h2>
-              <p className="text-slate-500 text-sm italic">Ambiente seguro com criptografia ponta-a-ponta.</p>
-            </header>
+        {/* NAVEGAÇÃO INTERNA (BOTÕES) */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
+          <button 
+            onClick={() => { console.log("Trocou para IA"); setAba('ia'); }}
+            style={{ padding: '12px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 'bold', backgroundColor: aba === 'ia' ? '#00afb9' : '#082635', color: aba === 'ia' ? '#021526' : 'white' }}
+          >
+            Analisador Preditivo
+          </button>
+          <button 
+            onClick={() => { console.log("Trocou para Logs"); setAba('logs'); }}
+            style={{ padding: '12px 24px', borderRadius: '10px', border: 'none', cursor: 'pointer', fontWeight: 'bold', backgroundColor: aba === 'logs' ? '#00afb9' : '#082635', color: aba === 'logs' ? '#021526' : 'white' }}
+          >
+            Histórico de Decisões
+          </button>
+        </div>
 
-            <div className="space-y-4">
-              <textarea 
-                value={sintomas}
-                onChange={(e) => setSintomas(e.target.value)}
-                className="w-full h-40 bg-[#021526] border border-cyan-900/30 rounded-2xl p-6 text-white outline-none focus:ring-2 ring-cyan-500/20 transition-all shadow-inner"
-                placeholder="Insira os dados clínicos para análise pericial..."
-              />
-              <button 
-                onClick={executarAnalise}
-                className="w-full bg-[#00afb9] text-[#010b13] font-black py-4 rounded-xl shadow-lg shadow-cyan-500/10 active:scale-95 transition-all flex items-center justify-center gap-2"
-              >
-                <Lock size={18} /> PROCESSAR DECISÃO CLÍNICA
-              </button>
-            </div>
-
-            {analiseAtual && (
-              <div className="mt-8 p-6 bg-cyan-950/20 border border-cyan-500/30 rounded-2xl border-l-4 border-l-cyan-500">
-                <span className="text-[10px] font-black text-cyan-500 uppercase tracking-widest">Resultado da IA</span>
-                <p className="mt-2 text-slate-300 leading-relaxed">{analiseAtual}</p>
-              </div>
+        {/* TELAS */}
+        {aba === 'ia' ? (
+          <div style={{ backgroundColor: '#082635', padding: '30px', borderRadius: '20px', border: '1px solid #1a3a4a' }}>
+            <h2 style={{ marginTop: 0 }}>Entrada de Dados Clínicos</h2>
+            <textarea 
+              value={texto}
+              onChange={(e) => setTexto(e.target.value)}
+              placeholder="Descreva aqui o caso para análise pericial..."
+              style={{ width: '100%', height: '200px', backgroundColor: '#010b13', color: 'white', border: '1px solid #1a3a4a', borderRadius: '12px', padding: '20px', fontSize: '16px', marginBottom: '20px', boxSizing: 'border-box' }}
+            />
+            <button 
+              onClick={processarDecisao}
+              style={{ width: '100%', padding: '20px', backgroundColor: '#00afb9', color: '#021526', border: 'none', borderRadius: '12px', fontWeight: '900', fontSize: '18px', cursor: 'pointer' }}
+            >
+              EXECUTAR COMANDO DE IA
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {logs.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#444' }}>Nenhum log pericial registrado.</p>
+            ) : (
+              logs.map(log => (
+                <div key={log.id} style={{ backgroundColor: '#010b13', padding: '20px', borderRadius: '15px', borderLeft: '5px solid #00afb9' }}>
+                  <div style={{ color: '#00afb9', fontSize: '12px', marginBottom: '10px', fontWeight: 'bold' }}>{log.data} | {log.status}</div>
+                  <div style={{ fontSize: '14px', lineHeight: '1.6' }}>{log.conteudo}</div>
+                </div>
+              ))
             )}
           </div>
         )}
-
-        {aba === 'logs' && (
-          <div className="animate-in slide-in-from-right duration-500">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2"><FileText /> Trilha de Auditoria (Logs)</h2>
-            <div className="space-y-4">
-              {logs.length === 0 ? (
-                <p className="text-slate-600 italic">Nenhum registro encontrado nesta sessão.</p>
-              ) : (
-                logs.map(log => (
-                  <div key={log.id} className="p-4 bg-[#081b2b] border border-slate-800 rounded-xl text-xs font-mono">
-                    <div className="flex justify-between text-cyan-500 mb-2 font-bold">
-                      <span>{log.id}</span>
-                      <span>{log.timestamp}</span>
-                    </div>
-                    <p className="text-slate-400 mb-1"><span className="text-slate-600">INPUT:</span> {log.entradaPaciente}</p>
-                    <p className="text-slate-200 mb-2"><span className="text-slate-600">OUTPUT:</span> {log.sugestaoIA}</p>
-                    <div className="text-[10px] text-slate-700 break-all border-t border-slate-800 pt-2 uppercase">
-                      Integrity Hash: {log.hashIntegridade}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
       </main>
 
-      <footer className="p-6 text-center border-t border-slate-900">
-        <p className="text-[9px] text-slate-700 font-bold uppercase tracking-[0.3em]">
-          BIOGSAÚDE Critical Infrastructure - Built for Medical Excellence
-        </p>
+      <footer style={{ textAlign: 'center', padding: '40px', color: '#444', fontSize: '10px', letterSpacing: '2px' }}>
+        BIOGSAÚDE INFRASTRUCTURE | POWERED BY MCTI - FINEP
       </footer>
     </div>
   );
